@@ -84,8 +84,8 @@ class _GoingToDropoffState extends State<GoingToDropoff> {
     creatIconMarker();
     CameraPosition initialLocation = CameraPosition(
       zoom: 12,
-      //  bearing: CAMERA_BEARING,
-      //  tilt: CAMERA_TILT,
+        //bearing: CAMERA_BEARING,
+       // tilt: CAMERA_TILT,
       target: LatLng(widget.requestModel!.pickUpLocation!.latitude!,widget.requestModel!.pickUpLocation!.longitude!),
     );
     return Scaffold(
@@ -140,7 +140,7 @@ class _GoingToDropoffState extends State<GoingToDropoff> {
 
       );
       setState(() {
-        CameraPosition cameraPosition=CameraPosition(target: myPosition!,zoom: 17);
+        CameraPosition cameraPosition=CameraPosition(target: myPosition!,zoom: 17,);
         _cameraMapController.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
         markerSet.removeWhere((marker) => marker.mapsId.value=='animating');

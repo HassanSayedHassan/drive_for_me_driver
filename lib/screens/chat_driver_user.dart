@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:bubble/bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drive_for_me_user/helpers/api_handlar.dart';
 import 'package:drive_for_me_user/helpers/help_fun.dart';
@@ -8,6 +8,7 @@ import 'package:drive_for_me_user/models/current_user_model.dart';
 import 'package:drive_for_me_user/models/driver_model.dart';
 import 'package:drive_for_me_user/models/request_model.dart';
 import 'package:drive_for_me_user/providers/driver_provider.dart';
+import 'package:drive_for_me_user/screens/show_image_in_screen.dart';
 import 'package:drive_for_me_user/services/firebase_api.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -170,98 +171,69 @@ class _ChatDriverUserState extends State<ChatDriverUser> {
   }
 
   Widget drowMessage(message, senderId, data,DriverModel user) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-          vertical: 7.h,
-          horizontal: 5.2),
+    return Bubble(
+      margin: BubbleEdges.only(top: 10),
+      alignment: senderId == user.id?Alignment.topRight:Alignment.topLeft,
+      nip: senderId == user.id?BubbleNip.rightTop:BubbleNip.leftTop,
+      color: senderId == user.id ? MyTheme(context).chatContainerRightColor : MyTheme(context).chatContainerLeftColor,
+      padding: BubbleEdges.only(top: 7.h, right:  5.w,left: 5.w),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: senderId == user.id
-            ? CrossAxisAlignment.end
-            : CrossAxisAlignment.start,
         children: [
-          Material(
-            borderRadius: BorderRadius.circular(10),
-            elevation: 5,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: senderId == user.id ? MyTheme(context).textColor : Colors.white,
-              ),
-              padding: EdgeInsets.symmetric(
-                  vertical:5.h,
-                  horizontal: 15.h),
-              child: Column(
-                children: [
-                  Text(
-                    message,
-                    style: TextStyle(
-                      color: senderId == user.id
-                          ? Colors.white
-                          : MyTheme(context).textColor,
-                      fontSize: 20.sp,
-                    ),
-                  ),
-                  Text(
-                    getdata(data),
-                    style: TextStyle(
-                        color: senderId == user.id
-                            ? Colors.white
-                            : MyTheme(context).textColor,
-                        fontSize: 14.sp),
-                  ),
-                ],
-              ),
+          Text(
+            message,
+            style: TextStyle(
+              color: senderId == user.id
+                  ? MyTheme(context).chatTextRightColor
+                  : MyTheme(context).chatTextLeftColor,
+              fontSize: 20.sp,
             ),
+          ),
+          SizedBox(height: 5.h,),
+          Text(
+            //  timeago.format(DateTime.parse(data)),
+            getdata(data),
+
+            style: TextStyle(
+                color: senderId == user.id
+                    ? MyTheme(context).chatTextRightColor
+                    : MyTheme(context).chatTextLeftColor,
+                fontSize: 14.sp),
           ),
         ],
       ),
     );
   }
-
-
   Widget drowImage(message, senderId, data,DriverModel user) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-          vertical: 7.h,
-          horizontal: 5.2),
+    return Bubble(
+      margin: BubbleEdges.only(top: 10),
+      alignment: senderId == user.id?Alignment.topRight:Alignment.topLeft,
+      nip: senderId == user.id?BubbleNip.rightTop:BubbleNip.leftTop,
+      color: senderId == user.id ? MyTheme(context).chatContainerRightColor : MyTheme(context).chatContainerLeftColor,
+      // padding: BubbleEdges.only(top: 7.h),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: senderId == user.id
-            ? CrossAxisAlignment.end
-            : CrossAxisAlignment.start,
         children: [
-          Material(
-            borderRadius: BorderRadius.circular(10),
-            elevation: 5,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: senderId == user.id ? MyTheme(context).textColor : Colors.white,
-              ),
-              padding: EdgeInsets.symmetric(
-                  vertical:5.h,
-                  horizontal: 15.h),
-              child: Column(
-                children: [
-                  Image.network(message,height: 250.h,width: 280.w,fit: BoxFit.cover,),
-                  Text(
-                    getdata(data),
-                    style: TextStyle(
-                        color: senderId == user.id
-                            ? Colors.white
-                            : MyTheme(context).textColor,
-                        fontSize: 14.sp),
-                  ),
-                ],
-              ),
-            ),
+          InkWell(
+              onTap: ()
+              {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => ShowImageInScreen(message),));
+              },
+              child: Image.network(message,height: 250.h,width: 280.w,fit: BoxFit.cover,)),
+          SizedBox(height: 5.h,),
+          Text(
+            //  timeago.format(DateTime.parse(data)),
+            getdata(data),
+
+            style: TextStyle(
+                color: senderId == user.id
+                    ? MyTheme(context).chatTextRightColor
+                    : MyTheme(context).chatTextLeftColor,
+                fontSize: 14.sp),
           ),
         ],
       ),
     );
   }
-
 
   String getdata(data) {
     DateTime todayDate = DateTime.parse(data);
@@ -283,7 +255,7 @@ class _ChatDriverUserState extends State<ChatDriverUser> {
       'senderId': user.id,
     });
     print("token Here ${widget.requestModel!.currentUserModel!.token!}");
-    FireBaseApi(context).sendNotificationToUser(widget.requestModel!.currentUserModel!.token!, widget.requestModel!.driverModel!.name!);
+    FireBaseApi(context).sendNotificationToUser(true,"New Message from  ${widget.requestModel!.driverModel!.name!}",widget.requestModel!.currentUserModel!.token!, widget.requestModel!.driverModel!.name!);
 
     /// TODO fore Unread Messages
 
@@ -332,7 +304,7 @@ class _ChatDriverUserState extends State<ChatDriverUser> {
       }
     });
 
-    FireBaseApi(context).sendNotificationToUser(widget.requestModel!.currentUserModel!.token!, widget.requestModel!.driverModel!.name!);
+    FireBaseApi(context).sendNotificationToUser(true,"New Message from  ${widget.requestModel!.driverModel!.name!}",widget.requestModel!.currentUserModel!.token!, widget.requestModel!.driverModel!.name!);
 
     FirebaseFirestore.instance.collection('requests')
         .doc(widget.requestModel!.id)

@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drive_for_me_user/constants/color.dart';
 import 'package:drive_for_me_user/constants/map_config.dart';
 import 'package:drive_for_me_user/helpers/help_fun.dart';
+import 'package:drive_for_me_user/models/driver_model.dart';
 import 'package:drive_for_me_user/providers/driver_provider.dart';
 import 'package:drive_for_me_user/providers/locations_data_providers.dart';
 import 'package:drive_for_me_user/res.dart';
@@ -15,6 +16,7 @@ import 'package:drive_for_me_user/services/location_service_repository.dart';
 import 'package:drive_for_me_user/services/location_services_func.dart';
 import 'package:drive_for_me_user/services/location_sevices.dart';
 import 'package:drive_for_me_user/services/notification_services.dart';
+import 'package:drive_for_me_user/widgets/custome_drower.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:drive_for_me_user/helpers/location_help_func.dart';
@@ -97,11 +99,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var driver=Provider.of<DriverProvider>(context,listen: false).getCurrentDriver;
-
+    var driver=Provider.of<DriverProvider>(context).getCurrentDriver;
+    print("id build ${driver.id}");
     return SafeArea(
       child: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: MyTheme(context).backgroundColor,
+        drawer: NavDrawer(),
         body: Stack(
           children: [
             GoogleMap(
@@ -116,12 +120,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     .moveCameraToCurrentPosition(_cameraMapController, context);
               },
             ),
-            drowTopContainer(),
+            drowTopContainer(driver),
             Positioned(
               left: 10.w,
               top: 30.h,
               child: InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    _scaffoldKey.currentState!.openDrawer();
+                  },
                   child: Icon(
                     Icons.dehaze_rounded,
                     color: MyTheme(context).iconColor,
@@ -151,8 +157,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget drowTopContainer() {
-    var driver=Provider.of<DriverProvider>(context,listen: false).getCurrentDriver;
+  Widget drowTopContainer(DriverModel  driver) {
+      print("id here ${driver.id}");
     return Positioned(
       top: 0,
       left: 0,

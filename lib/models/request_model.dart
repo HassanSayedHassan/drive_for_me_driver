@@ -15,7 +15,7 @@ class RequestModel
   Address? dropOffLocation=Address();
 
   String? status;
-  String? cashPrice;
+  double? cashPrice;
   double? rateDriver;
   String? userAnyComment;
   String? paymentMethode;
@@ -33,7 +33,7 @@ class RequestModel
     this.pickUpLocation,
     this.dropOffLocation,
     this.status="send",
-    this.cashPrice="NULL",
+    this.cashPrice=0.0,
     this.rateDriver=0.0,
     this.userAnyComment="NULL",
     this.paymentMethode="NULL",

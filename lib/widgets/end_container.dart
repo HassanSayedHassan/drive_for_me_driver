@@ -147,15 +147,31 @@ class _EndContainerState extends State<EndContainer> {
 
                 ],
               ),
-              SizedBox(height: 20.h,),
+              SizedBox(height: 10.h,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    radius: 30.sp,
-                    backgroundColor: MyTheme(context).buttonTextColor,
-                    child: Image.asset(Res.user_man),
+                Container(
+                width: 80.w,
+                height: 65.h,
+                decoration: BoxDecoration(
+                  //color: Colors.grey,
+                  shape: BoxShape.circle,
+                ),
+                child: ClipOval(
+                  child: Image.network(
+                    widget.requestModel!.currentUserModel!.imageUrl ?? "",
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(child: CircularProgressIndicator());
+                      // You can use LinearProgressIndicator or CircularProgressIndicator instead
+                    },
+                    errorBuilder: (context, error, stackTrace) =>
+                        Image.asset(Res.uber),
                   ),
+                ),
+              ),
                   SizedBox(width: 20.h,),
                   Column(
                     children: [

@@ -41,7 +41,22 @@ class MyTheme{
     return  Theme.of(context).brightness != Brightness.dark?
     MyColors.grayLight:MyColors.grayLight;
   }
-
+  Color get chatContainerRightColor{
+    return  Theme.of(context).brightness != Brightness.dark?
+    MyColors.primaryLight:MyColors.primaryDarkBlue;
+  }
+  Color get chatTextRightColor{
+    return  Theme.of(context).brightness != Brightness.dark?
+    Colors.white:Colors.black;
+  }
+  Color get chatContainerLeftColor{
+    return  Theme.of(context).brightness != Brightness.dark?
+    Color(0xffeae9e9):Colors.white;
+  }
+  Color get chatTextLeftColor{
+    return  Theme.of(context).brightness != Brightness.dark?
+    MyColors.primaryLight:MyColors.primaryDarkBlue;
+  }
   Color get buttonColor{
     return  Theme.of(context).brightness != Brightness.dark?
     MyColors.primaryLight:MyColors.primaryDarkBlue;

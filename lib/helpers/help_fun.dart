@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:drive_for_me_user/constants/color.dart';
 import 'package:drive_for_me_user/helpers/my_theme.dart';
+import 'package:drive_for_me_user/models/driver_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
@@ -113,24 +116,35 @@ class HelpFun {
         gravity: ToastGravity.CENTER,
         backgroundColor: Colors.green);
   }
-/*Future<void> saveSharedReferences(CurrentUserModel user) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setString('name', user.name??'NULL');
+  Future<void> saveSharedReferences(DriverModel driverModel) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-}
-Future<CurrentUserModel> getSharedReferences() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  CurrentUserModel user=CurrentUserModel();
-  user.name= prefs.getString('name')??'NULL';
+    DriverModel driver=driverModel;
+    String driverStr=  jsonEncode(driver.toJason());
 
+    await prefs.setString('driver', driverStr);
 
-  return user;
-}
+  }
+  Future<DriverModel> getSharedReferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    DriverModel driver=DriverModel();
+
+    String driverStr= prefs.getString('driver')??'NULL';
+
+    if(driverStr!='NULL')
+    {
+      driver=DriverModel.fromJson(jsonDecode(driverStr));
+    }
+
+    return driver;
+  }
+
 Future<void> removeSharedReferences() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  await prefs.setString('name', 'NULL');
+  await prefs.setString('driver', 'NULL');
 
-}*/
+}
 
 }

@@ -34,8 +34,10 @@ class EndTrip extends StatefulWidget {
 }
 
 class _EndTripState extends State<EndTrip> {
+
   @override
   Widget build(BuildContext context) {
+    print("totaaaal ${widget.requestModel!.driverModel!.ordersNumber}");
     return SafeArea(
       child: Scaffold(
         backgroundColor: MyTheme(context).backgroundColor,
@@ -60,15 +62,31 @@ class _EndTripState extends State<EndTrip> {
             SizedBox(
               height: 30.h,
             ),
-            CircleAvatar(
-              radius: 80.sp,
-              backgroundColor: MyTheme(context).buttonColor,
-              child: Image.asset(Res.user_man,fit: BoxFit.cover,),
+            Container(
+              width: 140.w,
+              height: 125.h,
+              decoration: BoxDecoration(
+                //color: Colors.grey,
+                shape: BoxShape.circle,
+              ),
+              child: ClipOval(
+                child: Image.network(
+                  widget.requestModel!.driverModel!.imageUrl ?? "",
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(child: CircularProgressIndicator());
+                    // You can use LinearProgressIndicator or CircularProgressIndicator instead
+                  },
+                  errorBuilder: (context, error, stackTrace) =>
+                      Image.asset(Res.uber),
+                ),
+              ),
             ),
             SizedBox(
               height: 30.h,
             ),
-            DrowRating(2.5,40),
+            DrowRating(widget.requestModel!.driverModel!.ratesNum==0?0:(widget.requestModel!.driverModel!.sumRates!/widget.requestModel!.driverModel!.ratesNum!), 40.r),
             SizedBox(
               height: 30.h,
             ),
@@ -115,7 +133,7 @@ class _EndTripState extends State<EndTrip> {
                           border: Border.all(color: MyTheme(context).textColor,width: 2)
                         ),
                         alignment: Alignment.center,
-                        child:  Text("Total Trips 20 +1",
+                        child:  Text("Total Requests ${widget.requestModel!.driverModel!.ordersNumber}",
                           style: TextStyle(
                               fontSize: 20.sp,
                               color: MyTheme(context).textColor,
@@ -132,7 +150,7 @@ class _EndTripState extends State<EndTrip> {
                             border: Border.all(color: MyTheme(context).textColor,width: 2)
                         ),
                         alignment: Alignment.center,
-                        child:  Text("Total cash 520 LE +32",
+                        child:  Text("Total cash ${widget.requestModel!.driverModel!.totalCash} + ${widget.requestModel!.cashPrice}",
                           style: TextStyle(
                               fontSize: 18.sp,
                               color: MyTheme(context).textColor,

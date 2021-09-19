@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drive_for_me_user/constants/map_config.dart';
@@ -13,6 +14,7 @@ import 'package:drive_for_me_user/screens/taped_screens.dart';
 import 'package:drive_for_me_user/widgets/end_trip.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -48,18 +50,19 @@ class FireBaseApi {
         {
           querySnapshot.docs.forEach((doc) {
              driverModel=DriverModel.fromJson(doc.data() as Map<String,dynamic>);
-            print("driver  ${driverModel.token}");
+            print("driveridlogin  ${driverModel.id}");
           });
 
           HelpFun.showSuccessToast(context, 'LoginSuccessfully');
           HelpFun.closeLoading(context);
 
           await saveDriverToken(driverModel.id!);
-
-          Provider.of<DriverProvider>(context,listen: false).updateCurrentDriver(driverModel);
-
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('driverId', driverModel.id!);
+          print("currentDriverUidsaved ${driverModel.id!}");
+          Provider.of<DriverProvider>(context,listen: false).updateCurrentDriver(driverModel);
+
+          HelpFun().saveSharedReferences(driverModel);
 
           Navigator.push(context, MaterialPageRoute(
                   builder: (context) => HomeScreen(),));
@@ -275,7 +278,7 @@ class FireBaseApi {
       });
 
       /// Send Notification To User
-      sendNotificationToUser(requestModel.currentUserModel!.token!,requestModel.driverModel!.name!);
+      sendNotificationToUser(false,"Drive Arrive To PickUp Location , Hope Safe Trip",requestModel.currentUserModel!.token!,requestModel.driverModel!.name!);
 
     }
     catch(e)
@@ -308,10 +311,14 @@ class FireBaseApi {
 
       await FirebaseFirestore.instance.collection('drivers').doc(requestModel.driverModel!.id!).
       update({
-        'OrdersNumber':FieldValue.increment(1),
+        'ordersNumber':FieldValue.increment(1),
+        "totalCash":FieldValue.increment(requestModel.cashPrice!)
       });
-
-      sendNotificationToUser(requestModel.currentUserModel!.token!,requestModel.driverModel!.name!);
+      await FirebaseFirestore.instance.collection('users').doc(requestModel.currentUserModel!.id!).
+      update({
+        'ordersNumber':FieldValue.increment(1),
+      });
+      sendNotificationToUser(false,"Drive Arrive To dropOff Location , Thanks For You",requestModel.currentUserModel!.token!,requestModel.driverModel!.name!);
       /// user and driver end orders
       /// Send Notification To User
 
@@ -326,12 +333,54 @@ class FireBaseApi {
     }
 
   }
-
-
-
-
-  Future<void> sendNotificationToUser(String userToken,String driverName)async
+  Future<void> updateDriverImage(DriverModel driverModel,File imageFile)async
   {
+    HelpFun.showLoading(context);
+
+
+    try
+    {
+
+        FirebaseStorage  storage  = FirebaseStorage.instance;
+        Reference ref = storage.ref().child('uploads/${driverModel.id}/${DateTime.now()}');
+        UploadTask uploadTask = ref.putFile(imageFile);
+
+
+        var res= await uploadTask;
+        String imageUrl= await res.ref.getDownloadURL();
+
+        driverModel.imageUrl=imageUrl;
+
+
+      await FirebaseFirestore.instance.collection('drivers').doc(driverModel.id).update(driverModel.toJason()).whenComplete(() async {
+
+        HelpFun().saveSharedReferences(driverModel);
+        Provider.of<DriverProvider>(context,listen: false).updateCurrentDriver(driverModel);
+        print(" after Url ${Provider.of<DriverProvider>(context,listen: false).getCurrentDriver.imageUrl}");
+      });
+
+
+      HelpFun.closeLoading(context);
+      HelpFun.showSuccessToast(context, "Update");
+
+    }
+    catch(e)
+    {
+      HelpFun.closeLoading(context);
+      HelpFun.showErrorToast(context, 'Catch error on  updateUser ${e.toString()}');
+      print('Catch error on  updateUser ${e.toString()}');
+
+    }
+
+
+
+  }
+
+
+
+  Future<void> sendNotificationToUser(bool isChat,String body ,String userToken,String driverName)async
+  {
+    var title=isChat?"Message":"Request";
     var headers = {
       'Content-Type': 'application/json',
       'Authorization': 'key=AAAAr5ZbWm4:APA91bH6IMCIASjSCrnnM_EOfgSATXGzzLchxT0ksno_9d7WTmWGPcXrR_dcJ5QXUDExo4RoPUNZOy13DbFS5_A96mcGVfOVd0BvTEiRirTZBgI9QmNapOrssl1tPkY-k66ThnSdBwBQ'
@@ -340,7 +389,7 @@ class FireBaseApi {
     request.body = json.encode({
       "to": userToken,
       "notification": {
-        "body": "New Rider Request",
+        "body": "$body",
         "OrganizationId": "2",
         "content_available": true,
         "priority": "high",
@@ -348,7 +397,7 @@ class FireBaseApi {
         "android_channel_id": "high_importance_channel",
         "playsound": "true",
         "sound": "taxi",
-        "Title": "New Request from  $driverName"
+        "title": "New $title"
       },
       "data": {
         "priority": "high",
@@ -369,7 +418,48 @@ class FireBaseApi {
     }
   }
 
+  Future<List<RequestModel>> getAllDriverTrips(DriverModel driverModel)async
+  {
+    // HelpFun.showLoading(context);
 
+    List<RequestModel> requestList=[];
+
+    try
+    {
+      await FirebaseFirestore.instance.collection('requests').where("driverModel.id",isEqualTo: driverModel.id)
+          .where("status",isEqualTo: "end").get().then((QuerySnapshot querySnapshot) async {
+
+
+
+        querySnapshot.docs.forEach((doc) {
+
+          requestList.add(RequestModel.fromJson(doc.data() as Map<String,dynamic>));
+
+
+        });
+
+        print("RequestsList  ${requestList.length}");
+        requestList.sort((a, b) => b.pickedDate!.compareTo(a.pickedDate!));
+        return requestList;
+
+      });
+
+
+      // HelpFun.closeLoading(context);
+      //HelpFun.showSuccessToast(context, "Update");
+
+    }
+    catch(e)
+    {
+      HelpFun.closeLoading(context);
+      HelpFun.showErrorToast(context, 'Catch error on  getAllTrips ${e.toString()}');
+      print('Catch error on  getAllTrips ${e.toString()}');
+
+    }
+    return requestList;
+
+
+  }
 
 }
 

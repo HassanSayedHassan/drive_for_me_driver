@@ -30,17 +30,18 @@ class PushNotificationServices
                 channel.description,
              //   color: Colors.blue,
                 playSound: true,
+
                 icon: '@mipmap/ic_launcher',
                 sound: RawResourceAndroidNotificationSound('taxi'),
               ),
             ));
       }
 
-       Navigator.push(context, MaterialPageRoute(
-               builder: (context) => CurrentRequestScreen(),));
+  //     Navigator.push(context, MaterialPageRoute(
+    //           builder: (context) => CurrentRequestScreen(),));
 
 
-      HelpFun.showToast(context, 'on message');
+   //   HelpFun.showToast(context, 'on message');
     });
 
     // when click on notification to open app
@@ -48,11 +49,11 @@ class PushNotificationServices
       print('on message opened app');
       print(message.data.toString());
 
-      Navigator.push(context, MaterialPageRoute(
-        builder: (context) => CurrentRequestScreen(),));
+  //    Navigator.push(context, MaterialPageRoute(
+  //      builder: (context) => CurrentRequestScreen(),));
 
 
-      HelpFun.showToast(context, 'on message opened app');
+  //    HelpFun.showToast(context, 'on message opened app');
     });
 
 
@@ -85,10 +86,10 @@ class PushNotificationServices
             ),
           ));
     }
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => CurrentRequestScreen(),));
+ //   Navigator.push(context, MaterialPageRoute(
+ //     builder: (context) => CurrentRequestScreen(),));
 
-    HelpFun.showToast(context, 'on background message');
+  //  HelpFun.showToast(context, 'on background message');
 
   }
 

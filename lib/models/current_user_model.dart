@@ -6,8 +6,6 @@ class CurrentUserModel {
   String ?phone;
   String ?email;
   String ?pass;
-  String ?imagUrl;
-  String ?imagStr;
   String ?token;
   String ?hasOrderId;
   String ?imageStr;
@@ -21,8 +19,6 @@ class CurrentUserModel {
     this.phone = 'NULL',
     this.email = 'NULL',
     this.pass = 'NULL',
-    this.imagUrl = 'NULL',
-    this.imagStr = 'NULL',
     this.token = 'NULL',
     this.hasOrderId = 'NULL',
     this.imageStr = 'NULL',
@@ -37,8 +33,6 @@ class CurrentUserModel {
     phone = json['phone'];
     email = json['email'];
     pass = json['pass'];
-    imagUrl = json['imagUrl'];
-    imagStr = json['imagStr'];
     token = json['token'];
     hasOrderId = json['hasOrderId'];
     hasOrder = json['hasOrder'];
@@ -53,8 +47,6 @@ class CurrentUserModel {
     'phone': phone,
     'email': email,
     'pass': pass,
-    'imagUrl': imagUrl,
-    'imagStr': imagStr,
     'token': token,
     'hasOrderId': hasOrderId,
     'hasOrder': hasOrder,

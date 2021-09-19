@@ -25,8 +25,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
 
-    phoneController.text="01145229131";
-    passController.text="123456789";
+   // phoneController.text="01145229131";
+   // passController.text="123456789";
     super.initState();
   }
 
@@ -122,7 +122,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       }
                     },
                     child: Icon(
-                      Icons.mood,
+                      Theme.of(context).brightness != Brightness.dark
+                          ? Icons.dark_mode_outlined
+                          : Icons.light_mode,
                       color: Colors.amber,
                       size: 40,
                     )),

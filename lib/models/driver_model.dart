@@ -45,7 +45,7 @@ class DriverModel{
     carNumber = data['carNumber'];
     carColor = data['carColor'];
     carType = data['carType'];
-    ordersNumber = data['OrdersNumber'];
+    ordersNumber = data['ordersNumber'];
     sumRates = data['sumRates'];
     hasOrderId = data['hasOrderId'];
     imageUrl = data['imageUrl'];
@@ -67,7 +67,7 @@ class DriverModel{
     'carColor' : carColor,
     'carType' : carType,
     'hasOrderId' : hasOrderId,
-    'OrdersNumber' : ordersNumber,
+    'ordersNumber' : ordersNumber,
     'ratesNum' : ratesNum,
     'totalCash' : totalCash,
     'sumRates' : sumRates,

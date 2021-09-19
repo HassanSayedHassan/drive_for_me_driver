@@ -39,7 +39,9 @@ class DriverProvider with ChangeNotifier {
     driverModel.hasOrderId=newDriver.hasOrderId;
     driverModel.imageStr=newDriver.imageStr;
     driverModel.imageUrl=newDriver.imageUrl;
-
+    driverModel.totalCash=newDriver.totalCash;
+    driverModel.sumRates=newDriver.sumRates;
+    driverModel.ratesNum=newDriver.ratesNum;
 
     notifyListeners();
   }
